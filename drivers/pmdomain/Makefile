@@ -21,3 +21,4 @@ obj-y					+= xilinx/
 obj-y					+= core.o governor.o
 obj-y					+= pm_test.o
 obj-y					+= pm_domain_test.o
+obj-y					+= pm_domain_oc_test.o
