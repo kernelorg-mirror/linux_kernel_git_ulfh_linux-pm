@@ -23,3 +23,4 @@ obj-y					+= pm_test.o
 obj-y					+= pm_domain_test.o
 obj-y					+= pm_domain_oc_test.o
 obj-y					+= pm_domain_oc_aux_test.o
+obj-y					+= pm_nopop_bus_test.o
