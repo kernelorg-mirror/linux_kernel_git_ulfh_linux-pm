@@ -443,10 +443,14 @@ static bool cpu_system_power_down_ok(struct dev_pm_domain *pd)
 
 		if (latency_ns <= constraint_ns) {
 			genpd->state_idx = state_idx;
+			trace_printk("Last CPU%d enters with state=%d\n",
+				     smp_processor_id(), state_idx);
 			return true;
 		}
 		state_idx--;
 	}
+
+	trace_printk("Last CPU%d failed to find a stated\n", smp_processor_id());
 
 	return false;
 }

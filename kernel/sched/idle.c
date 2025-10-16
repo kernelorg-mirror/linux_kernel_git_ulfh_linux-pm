@@ -194,6 +194,10 @@ static void cpuidle_idle_call(bool stop_tick)
 	}
 
 	if (cpuidle_not_available(drv, dev)) {
+		if (idle_should_enter_s2idle())
+			trace_printk("s2idle: CPU%d enter with default idle call\n",
+				     smp_processor_id());
+
 		idle_call_stop_or_retain_tick(stop_tick);
 
 		default_idle_call();
@@ -217,17 +221,28 @@ static void cpuidle_idle_call(bool stop_tick)
 			max_latency_ns = cpu_wakeup_latency_qos_limit() *
 					 NSEC_PER_USEC;
 
+			trace_printk("s2idle-enter: max_latency_ns=%llu\n", max_latency_ns);
+
 			entered_state = call_cpuidle_s2idle(drv, dev,
 							    max_latency_ns);
+
+			trace_printk("s2idle-exit: state=%d\n", entered_state);
+
 			if (entered_state > 0)
 				goto exit_idle;
 		} else {
 			max_latency_ns = dev->forced_idle_latency_limit_ns;
 		}
 
+
+		trace_printk("s2idle-failed/forced: max_latency_ns=%llu\n", max_latency_ns);
+
 		tick_nohz_idle_stop_tick();
 
 		next_state = cpuidle_find_deepest_state(drv, dev, max_latency_ns);
+
+		trace_printk("s2idle-failed/forced: using state=%d\n", next_state);
+
 		call_cpuidle(drv, dev, next_state);
 	} else if (drv->state_count > 1) {
 		/*
